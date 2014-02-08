@@ -1,0 +1,307 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Delight_Delightserial>
+			<version>0.1.16</version>
+		</Delight_Delightserial>
+	</modules>
+	
+	<global>
+		<models>
+			<delightserial>
+				<class>Delight_Delightserial_Model</class>
+				<resourceModel>delightserial_mysql4</resourceModel>
+			</delightserial>
+			
+			<delightserial_mysql4>
+				<class>Delight_Delightserial_Model_Mysql4</class>
+				<entities>
+					<groups>
+						<table>delightserial_serial_groups</table>
+					</groups>
+					<numbers>
+						<table>delightserial_available_numbers</table>
+					</numbers>
+					<purchased>
+						<table>delightserial_purchased_numbers</table>
+					</purchased>
+					<product>
+						<table>delightserial_product_assignment</table>
+					</product>
+					<pending>
+						<table>delightserial_pending_orders</table>
+					</pending>
+				</entities>
+			</delightserial_mysql4>
+
+			<sales>
+				<rewrite>
+					<order_invoice_item>Delight_Delightserial_Model_Sales_InvoiceItem</order_invoice_item>
+					<order_creditmemo_item>Delight_Delightserial_Model_Sales_CreditmemoItem</order_creditmemo_item>
+					<order_shipment_item>Delight_Delightserial_Model_Sales_ShipmentItem</order_shipment_item>
+				</rewrite>
+			</sales>
+		</models>
+
+		<blocks>
+			<delightserial>
+				<class>Delight_Delightserial_Block</class>
+			</delightserial>
+		</blocks>
+
+		<resources>
+			<delightserial_setup>
+				<setup>
+					<module>Delight_Delightserial</module>
+					<class>Mage_Catalog_Model_Resource_Eav_Mysql4_Setup</class>
+				</setup>
+				<connection>
+					<use>core_setup</use>
+				</connection>
+			</delightserial_setup>
+			<delightserial_write>
+				<connection>
+					<use>core_write</use>
+				</connection>
+			</delightserial_write>
+			<delightserial_read>
+				<connection>
+					<use>core_read</use>
+				</connection>
+			</delightserial_read>
+		</resources>
+		
+		<helpers>
+			<delightserial>
+				<class>Delight_Delightserial_Helper</class>
+			</delightserial>
+		</helpers>
+		
+		<pdf>
+			<delightserial>
+				<default>delightserial/product_pdf_items_default</default>
+			</delightserial>
+		</pdf>
+		
+		<!-- EMail Templates are in "locale/en_US/template/email/delightserial -->
+		<template>
+			<email>
+				<delightserial_email_serialnumber_template translate="label" module="delightserial">
+					<label>SerialNumbers Assigned</label>
+					<file>delightserial/assigned.html</file>
+					<type>html</type>
+				</delightserial_email_serialnumber_template>
+				<delightserial_email_serialnumber_guest_template translate="label" module="delightserial">
+					<label>SerialNumbers Assigned for Guest</label>
+					<file>delightserial/assigned_guest.html</file>
+					<type>html</type>
+				</delightserial_email_serialnumber_guest_template>
+				<delightserial_email_serialnumber_administrator translate="label" module="delightserial">
+					<label>To less Serial-Numbers in Serialgroup</label>
+					<file>delightserial/inform_administrator.html</file>
+					<type>html</type>
+				</delightserial_email_serialnumber_administrator>
+			</email>
+		</template>
+		
+	</global>
+	
+	<admin>
+		<routers>
+			<delightserial>
+				<use>admin</use>
+				<args>
+					<module>Delight_Delightserial</module>
+					<frontName>delightserial</frontName>
+				</args>
+			</delightserial>
+		</routers>
+	</admin>
+	
+	<default>
+		<catalog>
+			<delightserial>
+				<invoice_status>2</invoice_status>
+				<serials_group>Serial-Numbers Group</serials_group>
+			</delightserial>
+		</catalog>
+		
+		<sales_email>
+			<delightserial>
+				<enabled>1</enabled>
+				<template>delightserial_email_serialnumber_template</template>
+				<guest_template>delightserial_email_serialnumber_guest_template</guest_template>
+				<copy_to></copy_to>
+				<copy_method>bcc</copy_method>
+				<administrator>delightserial_email_serialnumber_administrator</administrator>
+				<identity>sales</identity>
+			</delightserial>
+		</sales_email>
+		
+		<delightserial_pdf>
+			<serialnumber>
+				<put_order_id>1</put_order_id>
+			</serialnumber>
+		</delightserial_pdf>
+	</default>
+	
+	<adminhtml>
+		<translate>
+			<modules>
+				<Delight_Delightserial>
+					<files>
+						<default>Delight_Delightserial.csv</default>
+					</files>
+				</Delight_Delightserial>
+			</modules>
+		</translate>
+
+		<layout>
+			<updates>
+				<delightserial>
+					<file>delightserial.xml</file>
+				</delightserial>
+			</updates>
+		</layout>
+		
+		<menu>
+			<catalog>
+				<children>
+					<delightserial_adminform translate="title" module="delightserial">
+						<title>Delight Serial-Numbers</title>
+						<action>delightserial/serialgroups</action>
+					</delightserial_adminform>
+				</children>
+			</catalog>
+		</menu>
+		
+		<acl>
+			<resources>
+				<admin>
+					<children>
+						<catalog>
+							<children>
+								<config>
+									<children>
+										<delightserial translate="title" module="delightserial">
+											<title>Delight Serial-Numbers</title>
+										</delightserial>
+									</children>
+								</config>
+								<delightserial_adminform translate="title" module="delightserial">
+									<title>Delight Serial-Numbers</title>
+								</delightserial_adminform>
+							</children>
+						</catalog>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+
+		<events>
+			<catalog_product_prepare_save>
+				<observers>
+					<delightserial_observer>
+						<type>singleton</type>
+						<class>delightserial/observer</class>
+						<method>prepareProductSave</method>
+					</delightserial_observer>
+				</observers>
+			</catalog_product_prepare_save>
+			
+			<catalog_product_save_after>
+				<observers>
+					<delightserial_observer>
+						<type>singleton</type>
+						<class>delightserial/observer</class>
+						<method>saveProduct</method>
+					</delightserial_observer>
+				</observers>
+			</catalog_product_save_after>
+			
+			<catalog_product_delete_after>
+				<observers>
+					<delightserial_observer>
+						<type>singleton</type>
+						<class>delightserial/observer</class>
+						<method>deleteProduct</method>
+					</delightserial_observer>
+				</observers>
+			</catalog_product_delete_after>
+
+			<sales_order_invoice_pay>
+				<observers>
+					<delightserial_observer>
+						<type>singleton</type>
+						<class>delightserial/observer</class>
+						<method>setSerialStatus</method>
+					</delightserial_observer>
+				</observers>
+			</sales_order_invoice_pay>
+
+			<delightserial_after_save>
+				<observers>
+					<delightserial_observer>
+						<type>singelton</type>
+						<class>delightserial/observer</class>
+						<method>sendPendingSerials</method>
+					</delightserial_observer>
+				</observers>
+			</delightserial_after_save>
+		</events>
+	</adminhtml>
+
+	<frontend>
+		<routers>
+			<delightserial>
+				<use>standard</use>
+				<args>
+					<module>Delight_Delightserial</module>
+					<frontName>delightserial</frontName>
+				</args>
+			</delightserial>
+		</routers>
+
+		<translate>
+			<modules>
+				<Delight_Delightserial>
+					<files>
+						<default>Delight_Delightserial.csv</default>
+					</files>
+				</Delight_Delightserial>
+			</modules>
+		</translate>
+		
+		<layout>
+			<updates>
+				<delightserial>
+					<file>delightserial.xml</file>
+				</delightserial>
+			</updates>
+		</layout>
+		
+		<events>
+			<sales_order_payment_pay>
+				<observers>
+					<delightserial_observer>
+						<type>singleton</type>
+						<class>delightserial/observer</class>
+						<method>setSerialStatus</method>
+					</delightserial_observer>
+				</observers>
+			</sales_order_payment_pay>
+			
+			<catalog_product_load_after>
+				<observers>
+					<delightserial_observer>
+						<type>singleton</type>
+						<class>delightserial/observer</class>
+						<method>setProductSerialGroup</method>
+					</delightserial_observer>
+				</observers>
+			</catalog_product_load_after>
+		</events>
+		
+	</frontend>
+
+</config>

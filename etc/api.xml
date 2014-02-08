@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<api>
+		<resources>
+			<delightserial translate="title" module="delightserial">
+				<model>delightserial/api</model>
+				<title>Methods to create/update/etc. SerialGroups and SerialNumbers</title>
+				<methods>
+					<setSerialGroups translate="title" module="delightserial">
+                        <title>Create a SerialGroup</title>
+                        <acl>catalog/product/create</acl>
+                        <method>setSerialGroup</method>
+                    </setSerialGroups>
+					<getSerialGroups translate="title" module="delightserial">
+                        <title>Change a SerialGroup</title>
+                        <acl>catalog/product/delightserial</acl>
+                        <method>getSerialGroups</method>
+                    </getSerialGroups>
+					<deleteSerialGroup translate="title" module="delightserial">
+                        <title>Removes a SerialGrpoup</title>
+                        <acl>catalog/product/delightserial</acl>
+                        <method>deleteSerialGroup</method>
+                    </deleteSerialGroup>
+				</methods>
+			</delightserial>
+		</resources>
+
+		<v2>
+			<resources_function_prefix>
+				<delightserial>delightserial</delightserial>
+			</resources_function_prefix>
+		</v2>
+		<acl>
+			<resources>
+				<all>
+				</all>
+			</resources>
+		</acl>
+	</api>
+</config>

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:typens="urn:{{var wsdl.name}}" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/"
+	name="{{var wsdl.name}}" targetNamespace="urn:{{var wsdl.name}}">
+
+	<types>
+		<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:Magento">
+			<import namespace="http://schemas.xmlsoap.org/soap/encoding/" schemaLocation="http://schemas.xmlsoap.org/soap/encoding/" />
+
+			<!-- We need an Attribute on the ProductCreateEntity -->
+			<complexType name="catalogProductCreateEntity">
+                <all>
+                	<element name="delightserial_data" type="xsd:int" minOccurs="0" />
+                </all>
+            </complexType>
+            <complexType name="catalogProductReturnEntity">
+                <all>
+                	<element name="delightserial_data" type="xsd:int" minOccurs="0" />
+                </all>
+            </complexType>
+
+			<!-- Serials and Grpups can be created in Array's -->
+			<complexType name="delightserialSerialGroupArray">
+                <complexContent>
+                    <restriction base="soapenc:Array">
+                        <attribute ref="soapenc:arrayType" wsdl:arrayType="typens:delightserialSerialGroupEntity[]" />
+                    </restriction>
+                </complexContent>
+            </complexType>
+            <complexType name="delightserialSerialGroupEntity">
+				<all>
+					<element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" />
+					<element name="entity_id" type="xsd:int" minOccurs="0" maxOccurs="1" />
+					<element name="serials" type="typens:delightserialSerialsArray" minOccurs="0" maxOccurs="1" />
+					<element name="products" type="typens:delightserialProductsArray" minOccurs="0" maxOccurs="1" />
+					<element name="return_products" type="xsd:boolean" minOccurs="0" maxOccurs="1" />
+					<!-- TODO: in future we want be able to define different groups on different stores -->
+					<element name="website" type="xsd:string" minOccurs="0" maxOccurs="1" />
+				</all>
+            </complexType>
+            <complexType name="delightserialSerialsArray">
+                <complexContent>
+                    <restriction base="soapenc:Array">
+                        <attribute ref="soapenc:arrayType" wsdl:arrayType="xsd:string[]" />
+                    </restriction>
+                </complexContent>
+            </complexType>
+            <complexType name="delightserialProductsArray">
+                <complexContent>
+                    <restriction base="soapenc:Array">
+                        <attribute ref="soapenc:arrayType" wsdl:arrayType="typens:delightserialProductEntity[]" />
+                    </restriction>
+                </complexContent>
+            </complexType>
+            <complexType name="delightserialProductEntity">
+				<all>
+					<element name="name" type="xsd:string" minOccurs="0" maxOccurs="1" />
+					<element name="sku" type="xsd:string" minOccurs="0" maxOccurs="1" />
+					<element name="entity_id" type="xsd:int" minOccurs="0" maxOccurs="1" />
+					<!-- TODO: in future we want be able to define different groups on different stores -->
+					<element name="websites" type="typens:ArrayOfString" minOccurs="0" maxOccurs="1" />
+				</all>
+            </complexType>
+            
+            <!-- response objects -->
+            <complexType name="delightserialSerialGroupResponseArray">
+                <complexContent>
+                    <restriction base="soapenc:Array">
+                        <attribute ref="soapenc:arrayType" wsdl:arrayType="typens:delightserialSerialGroupResponse[]" />
+                    </restriction>
+                </complexContent>
+            </complexType>
+            <complexType name="delightserialSerialGroupResponse">
+            	<all>
+            		<element name="name" type="xsd:string" minOccurs="1" maxOccurs="1" />
+            		<element name="entity_id" type="xsd:int" minOccurs="1" maxOccurs="1" />
+            		<element name="num_serials" type="xsd:int" minOccurs="0" maxOccurs="1" />
+            		<element name="success" type="xsd:boolean" minOccurs="0" maxOccurs="1" />
+            		<!-- Products will be listed only if requested -->
+            		<element name="products" type="typens:delightserialProductsArray" minOccurs="0" maxOccurs="1" />
+            	</all>
+            </complexType>
+
+		</schema>
+	</types>
+
+    <!-- Requests and Responses -->
+    <message name="delightserialSetSerialGroupRequest">
+        <part name="sessionId" type="xsd:string" />
+        <part name="groups" type="typens:delightserialSerialGroupArray" />
+    </message>
+    <message name="delightserialGetSerialGroupRequest">
+    	<part name="sessionId" type="xsd:string" />
+    </message>
+    <message name="delightserialDeleteSerialGroupRequest">
+        <part name="sessionId" type="xsd:string" />
+        <part name="group" type="typens:delightserialSerialGroupEntity" />
+    </message>
+    <message name="delightserialSerialGroupResponse">
+        <part name="groups" type="typens:delightserialSerialGroupResponseArray" />
+    </message>
+    <message name="delightserialDeleteSerialGroupResponse">
+        <part name="success" type="xsd:boolean" />
+    </message>
+
+
+	<!-- define all possible operations here for the messages above -->
+    <portType name="{{var wsdl.handler}}PortType">
+        <operation name="delightserialSetSerialGroups">
+            <documentation>Create/Update SerialGroups</documentation>
+            <input message="typens:delightserialSetSerialGroupRequest" />
+            <output message="typens:delightserialSerialGroupResponse" />
+        </operation>
+        <operation name="delightserialGetSerialGroups">
+            <documentation>Get all Products</documentation>
+            <input message="typens:delightserialGetSerialGroupRequest" />
+            <output message="typens:delightserialSerialGroupResponse" />
+        </operation>
+        <operation name="delightserialDeleteSerialGroup">
+            <documentation>Delete a SerialGroup</documentation>
+            <input message="typens:delightserialDeleteSerialGroupRequest" />
+            <output message="typens:delightserialDeleteSerialGroupResponse" />
+        </operation>
+    </portType>
+
+    <binding name="{{var wsdl.handler}}Binding" type="typens:{{var wsdl.handler}}PortType">
+    	<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+
+        <operation name="delightserialSetSerialGroups">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input><soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" /></input>
+            <output><soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" /></output>
+        </operation>
+        <operation name="delightserialGetSerialGroups">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input><soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" /></input>
+            <output><soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" /></output>
+        </operation>
+        <operation name="delightserialDeleteSerialGroup">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input><soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" /></input>
+            <output><soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" /></output>
+        </operation>
+    </binding>
+
+	<service name="{{var wsdl.name}}Service">
+        <port name="{{var wsdl.handler}}Port" binding="typens:{{var wsdl.handler}}Binding">
+            <soap:address location="{{var wsdl.url}}" />
+        </port>
+    </service>
+
+</definitions>
