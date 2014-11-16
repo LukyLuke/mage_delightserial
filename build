@@ -1,0 +1,93 @@
+#!/bin/bash
+#
+# An automated build of a Mageto module for easier installation
+#
+# Create a .build directory, create needed configuration
+# file and copy over all sources. After you can copy the
+# content of this .build folder to your magento installation.
+# 
+# Version: 0.1
+# Author: Lukas Zurschmiede <lukas.zurschmiede@ranta.ch>
+# Copyright: (c) 2014 Lukas Zurschmiede
+# License: GPLv3 or later
+#
+
+# Include the local configuration
+. ./build.conf
+
+# Set default values
+COMPANY=${COMPANY:-""}
+MODULE=${MODULE:-""}
+CODE_POOL=${CODE_POOL:-"local"}
+DEFAULT_ACTIVE=${DEFAULT_ACTIVE:-"true"}
+DEPENDS=${DEPENDS:-""}
+BUILD=${BUILD:-".build"}
+
+# Clean up
+PWD=`pwd`
+if [ ${#PWD} -gt 1 ]; then
+	rm -Rf ${PWD}/${BUILD} 2>/dev/null
+fi
+
+# If no module name is given, check the xml configuration
+if [[ -z "${MODULE}" || -z "${COMPANY}" ]]; then
+	_TMP=`grep --color=never -Pzo '(?s)<modules>\s*<([^_>]+)_([^>]+)>' etc/config.xml | grep --color=never -Pzo '<([^_>]+)_([^>]+)>' | head -1`
+	_TMP=${_TMP:1:-1}
+	COMPANY=${_TMP%_*}
+	MODULE=${_TMP#*_}
+fi
+
+if [[ -z "${MODULE}" || -z "${COMPANY}" ]]; then
+	echo "No COMPANY and/or no MODULE in the configuration file given"
+	echo "The automativ extraction from etc/config.xml failed,"
+	echo "there must be a <modules> part and within a <Company_Module>"
+	echo "which identifies this module."
+	echo "Correct this errors and try it again, or use build.conf in"
+	echo "this folder for givin the COMPANY and MODULE name."
+	exit 1
+fi
+
+# Uppercase first char of module and company
+COMPANY=`echo ${COMPANY:0:1} | tr '[a-z]' '[A-Z]'`${COMPANY:1}
+MODULE=`echo ${MODULE:0:1} | tr '[a-z]' '[A-Z]'`${MODULE:1}
+
+# Only 'local', 'core' and 'community' is allowed as code pool
+if [[ ! ${CODE_POOL} =~ ^(local|community|core)$ ]]; then
+	CODE_POOL="local"
+fi
+
+# Build the main folder structure
+mkdir -p ${BUILD}/app/code/local/${COMPANY}/${MODULE}/
+mkdir -p ${BUILD}/etc/modules/
+
+# Copy over all sources, but no "." directories and not this script and conf
+for F in `ls -1 --hide="*\.conf" --hide="build" --hide="\.*"`; do
+	cp -R ${F} ${BUILD}/app/code/local/${COMPANY}/${MODULE}/
+done
+
+# Create module dependencies xml
+_DEPENDENCIES=""
+for DEP in ${DEPENDS}; do
+	_DEPENDENCIES=${_DEPENDENCIES}$(cat <<VAR
+<${DEP} />
+VAR
+	)
+done
+
+# Write the configuration xml
+cat > ${BUILD}/etc/modules/${COMPANY}_${MODULE}.xml <<EOF
+<?xml version="1.0"?>
+<config>
+  <modules>
+    <${COMPANY}_${MODULE}>
+      <active>${DEFAULT_ACTIVE}</active>
+      <codePool>${CODE_POOL}</codePool>
+      <depends>
+        ${_DEPENDENCIES}
+      </depends>
+    </${COMPANY}_${MODULE}>
+  </modules>
+</config> 
+EOF
+
+exit 0
